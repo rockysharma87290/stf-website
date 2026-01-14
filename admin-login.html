@@ -6,8 +6,45 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h2>Admin Login</h2>
-<input placeholder="Mobile Number">
-<button>OTP भेजें</button>
+
+<h2>Admin Login (OTP)</h2>
+
+<input id="mobile" placeholder="मोबाइल नंबर" />
+<br><br>
+
+<div id="recaptcha-container"></div>
+
+<br>
+<button onclick="sendOTP()">OTP भेजें</button>
+
+<br><br>
+<input id="otp" placeholder="OTP" />
+<button onclick="verifyOTP()">Verify</button>
+
+<script type="module">
+import { auth } from "./firebase.js";
+import { signInWithPhoneNumber, RecaptchaVerifier }
+from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+window.recaptchaVerifier = new RecaptchaVerifier(
+  'recaptcha-container',
+  { size: 'normal' },
+  auth
+);
+
+window.sendOTP = async () => {
+  const phone = "+91" + document.getElementById("mobile").value;
+  window.confirmationResult =
+    await signInWithPhoneNumber(auth, phone, window.recaptchaVerifier);
+  alert("OTP भेज दिया गया");
+};
+
+window.verifyOTP = async () => {
+  const code = document.getElementById("otp").value;
+  await window.confirmationResult.confirm(code);
+  alert("Login Successful");
+};
+</script>
+
 </body>
 </html>
