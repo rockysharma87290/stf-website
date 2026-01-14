@@ -12,34 +12,43 @@
 <input id="mobile" placeholder="मोबाइल नंबर" />
 <br><br>
 
+<!-- 🔴 reCAPTCHA box -->
 <div id="recaptcha-container"></div>
 
 <br>
-<button onclick="sendOTP()">OTP भेजें</button>
+<button id="sendBtn">OTP भेजें</button>
 
 <br><br>
 <input id="otp" placeholder="OTP" />
-<button onclick="verifyOTP()">Verify</button>
+<button id="verifyBtn">Verify</button>
 
 <script type="module">
 import { auth } from "./firebase.js";
-import { signInWithPhoneNumber, RecaptchaVerifier }
-from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+import {
+  signInWithPhoneNumber,
+  RecaptchaVerifier
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
-window.recaptchaVerifier = new RecaptchaVerifier(
-  'recaptcha-container',
-  { size: 'normal' },
-  auth
-);
+/* 🔥 reCAPTCHA render AFTER page load */
+window.onload = () => {
+  window.recaptchaVerifier = new RecaptchaVerifier(
+    'recaptcha-container',
+    {
+      size: 'normal'
+    },
+    auth
+  );
+  recaptchaVerifier.render();
+};
 
-window.sendOTP = async () => {
+document.getElementById("sendBtn").onclick = async () => {
   const phone = "+91" + document.getElementById("mobile").value;
   window.confirmationResult =
     await signInWithPhoneNumber(auth, phone, window.recaptchaVerifier);
   alert("OTP भेज दिया गया");
 };
 
-window.verifyOTP = async () => {
+document.getElementById("verifyBtn").onclick = async () => {
   const code = document.getElementById("otp").value;
   await window.confirmationResult.confirm(code);
   alert("Login Successful");
